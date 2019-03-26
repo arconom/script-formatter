@@ -4,25 +4,31 @@ var sceneHeaderRegex = /SCENE\s(\d+)/g;
 var characterNames = ["MAN", "WOMAN"];
 var documentTags = ["TITLE", "END", "PLAY", "CURTAIN"];
 var stageDirectionRegex = /\(([\s\S]+?)\)/g;
-var dialogueRegex = new RegExp("(" + characterNames.join("|") + ")([\\s\\S]+?)(?=" + characterNames.join("|") + "|" + documentTags.join("|") + ")", "g");
+var dialogueRegex = new RegExp("((?:" + characterNames.join("|") + ")(?:\\s*cont\\.\\s*)?)([\\s\\S]+?)(?=" + characterNames.join("|") + "|" + documentTags.join("|") + ")","g");
 
 document.querySelector("head").innerHTML = "";
 
 AddStyleSheet(".direction{margin-left: 4em; background-color: lightgray;}" 
 + ".MAN{background-color: lightblue;}" 
-+ ".WOMAN{background-color: orange;}"
-+ ".title, .footer, .header{text-align: center;}"
-+ ".name{font-weight: bold;}"
++ ".WOMAN{background-color: orange;}" 
++ ".MAN,.WOMAN{margin-left: 2em;}"
++ ".title, .footer, .header{text-align: center;}" 
++ ".name{font-weight: bold;}" 
 + ".page-number{float:right;}"
++ ".line-number{float:left; display:inline-block; background-color: white;}"
 );
 
 document.body.innerHTML = script
 .replace(dialogueRegex, "<div class=\"$1\"><div class=\"name\">$1</div><p>$2</p></div>")
 .replace(stageDirectionRegex, "<div class=\"direction\">$1</div>")
 .replace(sceneHeaderRegex, "<h3 class=\"header\">SCENE $1</h3>")
-.replace(new RegExp(title + "\\s*(\\d+)", "g"), "<br/><hr/><br/><h2 class=\"title\">"+title+"</h2><span class=\"page-number\">$1</span>")
-.replace("END SCENE", "<div class=\"footer\">END SCENE</div>")
-;
+.replace(new RegExp(title + "\\s*(\\d+)","g"), "<br/><hr/><br/><h2 class=\"title\">" + title + "<span class=\"page-number\">$1</span></h2>")
+.replace(new RegExp("(END SCENE|CURTAIN)", "g"), "<div class=\"footer\">$1</div>");
+
+Array.prototype.forEach.call(document.querySelectorAll("." + characterNames.join(",.")), function(x, i, a) {
+    x.insertAdjacentHTML("beforebegin", "<div class=\"line-number\">" + i + "</div>")
+// console.log(x);
+});
 
 /*
         This adds some CSS to the page
