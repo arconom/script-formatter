@@ -1,0 +1,51 @@
+var text;
+var originalText;
+var encodedText;
+var decodedText;
+
+function fileToText(file) {
+
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+        originalText = e.target.result;
+        text = window.btoa(e.target.result);
+        encodedText = text;
+        console.log(text);
+    }
+    reader.readAsBinaryString(file);
+}
+function textToFile(text) {
+    decodedText = window.atob(text);
+    var bits = binaryStringToBytes(decodedText);
+
+    var file = new File([bits], "foo.zip", {
+        type: "application/zip",
+    });
+    downloadFile(file);
+}
+function downloadFile(file) {
+    var a = document.createElement("a"),
+    url = URL.createObjectURL(file);
+    a.href = url;
+    a.download = "lol.zip";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }, 0);
+}
+function binaryStringToBytes(string) {
+    var bytes = new Uint8Array(string.length);
+
+    for (let i = 0; i < string.length; i++) {
+        bytes[i] = string.charCodeAt(i);
+    }
+
+    return bytes;
+}
+
+function validate() {
+    return originalText == decodedText;
+}
